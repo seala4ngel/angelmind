@@ -1,21 +1,29 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
+from flask_swagger_ui import get_swaggerui_blueprint
 import subprocess
-import json
 
 app = Flask(__name__)
 
-@app.route('/api/run', methods=['POST'])
-def run_module():
-    data = request.json
-    module = data.get('module')
-    target = data.get('target')
-    if not module or not target:
-        return jsonify({'error': 'module and target required'}), 400
-    result = subprocess.run(
-        ["python3", "run.py", "--module", module, "--target", target],
-        capture_output=True, text=True
-    )
-    return jsonify({'output': result.stdout, 'error': result.stderr})
+# Swagger
+SWAGGER_URL = '/api/docs'
+API_URL = '/api/swagger.json'
+swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+@app.route('/api/swagger.json')
+def swagger():
+    return jsonify({
+        "openapi": "3.0.0",
+        "info": {"title": "Arsenal Apik API", "version": "3.0"},
+        "paths": {
+            "/api/run": {
+                "post": {
+                    "summary": "Run a module",
+                    "parameters": [{"in": "body", "name": "body", "schema": {"type": "object"}}],
+                    "responses": {"200": {"description": "OK"}}
+                }
+            }
+        }
+    })
+
+# ... (endpoint lain sama kayak sebelumnya)

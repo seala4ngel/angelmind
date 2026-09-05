@@ -60,4 +60,13 @@ class SubHunter:
         domain = target.replace('https://', '').replace('http://', '').split('/')[0]
         subdomains = self.passive(domain)
         results = self.active(subdomains)
-        return {'target': domain, 'total': len(results), 'alive': [r for r in results if r['alive']], 'dead': [r for r in results if not r['alive']], 'all': results, 'priority': self.priority, 'level': self.level}
+        return {
+            'module': 'subhunter',
+            'target': domain,
+            'total': len(results),
+            'alive': [r for r in results if r['alive']],
+            'dead': [r for r in results if not r['alive']],
+            'all': results,
+            'priority': self.priority,
+            'level': self.level
+        }

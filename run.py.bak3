@@ -10,12 +10,12 @@ from modules.scanner import Misconfig, LeakScan, BucketScan
 from modules.fuzz import WebFuzz, APIFuzz, IntelFuzz
 from modules.c2 import Implant, Beacon
 from modules.post import Privesc, Lateral, Cleanup, Persist
-from modules.attack import Phishing, ExploitPayload, Attack
+from modules.attack import Phishing, ExploitPayload
 from modules.research import Weaponize, Diff, Crash
 from modules.phish import MailCraft, Pretext
 
 def main():
-    parser = argparse.ArgumentParser(description='Arsenal Apik v3.1 — 39 Custom Modules')
+    parser = argparse.ArgumentParser(description='Arsenal Apik v3.1 — 38 Custom Modules')
     parser.add_argument('--module', '-m', required=True,
                         choices=[
                             'subhunter', 'portprobe', 'fingerprint',
@@ -27,7 +27,7 @@ def main():
                             'privesc', 'lateral', 'cleanup', 'persist',
                             'phishing', 'exploit_payload',
                             'weaponize', 'diff', 'crash',
-                            'mailcraft', 'pretext', 'attack'
+                            'mailcraft', 'pretext'
                         ],
                         help='Module to run')
     parser.add_argument('--target', '-t', required=True, help='Target URL or domain')
@@ -113,8 +113,6 @@ def main():
         result = MailCraft(engine).generate(args.target, args.param or 'invoice')
     elif args.module == 'pretext':
         result = Pretext(engine).generate(args.target, args.param or 'it_support')
-    elif args.module == 'attack':
-        result = Attack(engine).scan(args.target)
     else:
         print(f"Error: Unknown module '{args.module}'")
         sys.exit(1)

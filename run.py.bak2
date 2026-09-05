@@ -3,31 +3,30 @@ import sys
 import json
 import argparse
 from core.engine import ArsenalEngine
-from core.report import Report
 from modules.recon import SubHunter, PortProbe, Fingerprint
 from modules.exploit import SQLi, XSS, SSRF, SSTI, GraphQL, Deser, AuthBypass, Chain, VulnTrigger, RevShell, SQLiShell, SSRFRCE, Uploader
 from modules.scanner import Misconfig, LeakScan, BucketScan
-from modules.fuzz import WebFuzz, APIFuzz, IntelFuzz
+from modules.fuzz import WebFuzz, APIFuzz
 from modules.c2 import Implant, Beacon
 from modules.post import Privesc, Lateral, Cleanup, Persist
-from modules.attack import Phishing, ExploitPayload, Attack
+from modules.attack import Phishing, ExploitPayload
 from modules.research import Weaponize, Diff, Crash
 from modules.phish import MailCraft, Pretext
 
 def main():
-    parser = argparse.ArgumentParser(description='Arsenal Apik v3.1 — 39 Custom Modules')
+    parser = argparse.ArgumentParser(description='Arsenal Apik v3.1 — 37 Custom Modules')
     parser.add_argument('--module', '-m', required=True,
                         choices=[
                             'subhunter', 'portprobe', 'fingerprint',
                             'sqli', 'xss', 'ssrf', 'ssti', 'graphql', 'deser', 'authbypass', 'chain', 'vulntrigger',
                             'revshell', 'sqli_shell', 'ssrf_shell', 'uploader',
                             'misconfig', 'leakscan', 'bucketscan',
-                            'webfuzz', 'apifuzz', 'intel_fuzz',
+                            'webfuzz', 'apifuzz',
                             'implant', 'beacon',
                             'privesc', 'lateral', 'cleanup', 'persist',
                             'phishing', 'exploit_payload',
                             'weaponize', 'diff', 'crash',
-                            'mailcraft', 'pretext', 'attack'
+                            'mailcraft', 'pretext'
                         ],
                         help='Module to run')
     parser.add_argument('--target', '-t', required=True, help='Target URL or domain')
@@ -37,7 +36,7 @@ def main():
     parser.add_argument('--platform', default='linux', help='linux/windows/php/python/powershell')
     parser.add_argument('--upload-path', default='/upload', help='Upload path')
     parser.add_argument('--webshell-path', default='/var/www/html/shell.php', help='Webshell path')
-    parser.add_argument('--output', '-o', default='json', help='json, markdown, or text')
+    parser.add_argument('--output', '-o', default='json', help='json or text')
     
     args = parser.parse_args()
     engine = ArsenalEngine()
@@ -85,8 +84,6 @@ def main():
         result = WebFuzz(engine).scan(args.target)
     elif args.module == 'apifuzz':
         result = APIFuzz(engine).scan(args.target)
-    elif args.module == 'intel_fuzz':
-        result = IntelFuzz(engine).scan(args.target)
     elif args.module == 'implant':
         result = Implant(engine).generate(args.target)
     elif args.module == 'beacon':
@@ -102,29 +99,22 @@ def main():
     elif args.module == 'phishing':
         result = Phishing(engine).scan(args.target, args.param.split(',') if args.param else [], {})
     elif args.module == 'exploit_payload':
-        result = ExploitPayload(engine).scan(args.target, args.ip, args.port, args.platform, 'reverse')
+        result = ExploitPayload(engine).scan(args.target, args.ip, args.port, args.platform, "reverse")
     elif args.module == 'weaponize':
-        result = Weaponize(engine).scan(args.target, args.param, 'rce')
+        result = Weaponize(engine).scan(args.target, args.param, "rce")
     elif args.module == 'diff':
-        result = Diff(engine).scan(args.target, args.param, 'after')
+        result = Diff(engine).scan(args.target, args.param, "after")
     elif args.module == 'crash':
         result = Crash(engine).scan(args.target, args.param)
     elif args.module == 'mailcraft':
-        result = MailCraft(engine).generate(args.target, args.param or 'invoice')
+        result = MailCraft(engine).generate(args.target, args.param or "invoice")
     elif args.module == 'pretext':
-        result = Pretext(engine).generate(args.target, args.param or 'it_support')
-    elif args.module == 'attack':
-        result = Attack(engine).scan(args.target)
+        result = Pretext(engine).generate(args.target, args.param or "it_support")
     else:
         print(f"Error: Unknown module '{args.module}'")
         sys.exit(1)
     
-    # Output formatting
-    if args.output == 'markdown' and result:
-        report = Report([result])
-        print(report.to_markdown())
-    else:
-        print(json.dumps(result, indent=2) if args.output == 'json' else result)
+    print(json.dumps(result, indent=2) if args.output == 'json' else result)
 
 if __name__ == '__main__':
     main()

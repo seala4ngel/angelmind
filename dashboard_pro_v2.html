@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenal Apik — Pro Dashboard v2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e17; color: #c9d1d9; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        .sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 220px; background: #0d1117; border-right: 1px solid #1e2a3a; padding: 20px 0; overflow-y: auto; z-index: 1000; }
+        .sidebar .logo { padding: 0 20px 30px; font-size: 18px; font-weight: 700; color: #58a6ff; letter-spacing: -0.5px; }
+        .sidebar .logo span { color: #f0883e; }
+        .sidebar .nav-item { padding: 10px 20px; color: #8b949e; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; font-size: 14px; }
+        .sidebar .nav-item:hover, .sidebar .nav-item.active { background: #161b22; color: #c9d1d9; border-left-color: #58a6ff; }
+        .sidebar .nav-item i { width: 22px; margin-right: 10px; }
+        .main-content { margin-left: 220px; padding: 20px 30px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 20px; border-bottom: 1px solid #1e2a3a; }
+        .topbar h2 { font-size: 20px; font-weight: 600; }
+        .topbar .badge { background: #1e2a3a; color: #8b949e; padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .stat-card { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 12px; padding: 18px; transition: 0.3s; }
+        .stat-card:hover { border-color: #58a6ff; }
+        .stat-card .icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .stat-card .label { color: #8b949e; font-size: 13px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; }
+        .card-dark { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 12px; }
+        .card-dark .card-header { background: transparent; border-bottom: 1px solid #1e2a3a; padding: 15px 20px; font-weight: 600; }
+        .card-dark .card-body { padding: 20px; }
+        .output-box { background: #0a0e17; border: 1px solid #1e2a3a; border-radius: 8px; padding: 15px; max-height: 350px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+        .output-box .key { color: #f0883e; }
+        .output-box .string { color: #a5d6ff; }
+        .output-box .number { color: #79c0ff; }
+        .output-box .boolean { color: #f85149; }
+        .btn-arsenal { background: #238636; border: none; color: white; padding: 6px 16px; border-radius: 6px; font-size: 13px; transition: 0.2s; }
+        .btn-arsenal:hover { background: #2ea043; color: white; }
+        .btn-arsenal-outline { background: transparent; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 16px; border-radius: 6px; font-size: 13px; transition: 0.2s; }
+        .btn-arsenal-outline:hover { border-color: #58a6ff; color: #58a6ff; }
+        .module-tag { background: #161b22; border: 1px solid #1e2a3a; padding: 4px 12px; border-radius: 16px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .module-tag:hover { border-color: #58a6ff; background: #1e2a3a; }
+        .beacon-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e2a3a; font-size: 13px; }
+        .beacon-item .status { font-weight: 600; }
+        .status-online { color: #3fb950; }
+        .status-offline { color: #f85149; }
+        .table-arsenal { font-size: 13px; }
+        .table-arsenal th { color: #8b949e; font-weight: 500; border-bottom: 1px solid #1e2a3a; }
+        .table-arsenal td { border-bottom: 1px solid #1e2a3a; padding: 8px 0; }
+        .badge-p1 { background: #f85149; color: white; }
+        .badge-p2 { background: #d29922; color: white; }
+        .badge-p3 { background: #58a6ff; color: white; }
+        .badge-p4 { background: #3fb950; color: white; }
+        .badge-p5 { background: #8b949e; color: white; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0e17; }
+        ::-webkit-scrollbar-thumb { background: #1e2a3a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #30363d; }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="logo">🧠 <span>Arsenal</span> Apik</div>
+    <div class="nav-item active"><i class="bi bi-speedometer2"></i> Dashboard</div>
+    <div class="nav-item"><i class="bi bi-grid-3x3-gap-fill"></i> Modules</div>
+    <div class="nav-item"><i class="bi bi-hdd-network-fill"></i> C2</div>
+    <div class="nav-item"><i class="bi bi-file-earmark-text"></i> Findings</div>
+    <div class="nav-item"><i class="bi bi-gear"></i> Settings</div>
+    <div style="position: absolute; bottom: 20px; left: 0; width: 100%; padding: 0 20px;">
+        <div class="text-secondary" style="font-size: 11px;">v3.0 · 33 modules</div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+        <h2><i class="bi bi-shield-lock-fill text-primary"></i> Dashboard</h2>
+        <div>
+            <span class="badge"><i class="bi bi-circle-fill text-success" style="font-size: 8px;"></i> System Online</span>
+            <span class="badge"><i class="bi bi-person"></i> @seala4ngel</span>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card d-flex align-items-center">
+                <div class="icon bg-primary bg-opacity-10 text-primary me-3"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                <div><div class="label">Modules</div><div class="value" id="totalModules">33</div></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card d-flex align-items-center">
+                <div class="icon bg-success bg-opacity-10 text-success me-3"><i class="bi bi-wifi"></i></div>
+                <div><div class="label">Beacons</div><div class="value" id="beaconCount">0</div></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card d-flex align-items-center">
+                <div class="icon bg-warning bg-opacity-10 text-warning me-3"><i class="bi bi-file-earmark-text"></i></div>
+                <div><div class="label">Findings</div><div class="value" id="findingsCount">0</div></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card d-flex align-items-center">
+                <div class="icon bg-danger bg-opacity-10 text-danger me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div><div class="label">Critical (P1)</div><div class="value" id="criticalCount">0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Row -->
+    <div class="row g-3">
+        <!-- Run Module -->
+        <div class="col-md-5">
+            <div class="card-dark">
+                <div class="card-header"><i class="bi bi-play-circle-fill text-success me-2"></i> Execute Module</div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-7">
+                            <select class="form-select form-select-sm bg-dark text-light border-secondary" id="moduleSelect">
+                                <option value="subhunter">subhunter</option>
+                                <option value="portprobe">portprobe</option>
+                                <option value="fingerprint">fingerprint</option>
+                                <option value="sqli">sqli</option>
+                                <option value="xss">xss</option>
+                                <option value="ssrf">ssrf</option>
+                                <option value="ssti">ssti</option>
+                                <option value="graphql">graphql</option>
+                                <option value="deser">deser</option>
+                                <option value="authbypass">authbypass</option>
+                                <option value="chain">chain</option>
+                                <option value="vulntrigger">vulntrigger</option>
+                                <option value="misconfig">misconfig</option>
+                                <option value="leakscan">leakscan</option>
+                                <option value="bucketscan">bucketscan</option>
+                                <option value="webfuzz">webfuzz</option>
+                                <option value="apifuzz">apifuzz</option>
+                                <option value="implant">implant</option>
+                                <option value="beacon">beacon</option>
+                                <option value="privesc">privesc</option>
+                                <option value="lateral">lateral</option>
+                                <option value="cleanup">cleanup</option>
+                                <option value="persist">persist</option>
+                                <option value="phishing">phishing</option>
+                                <option value="exploit_payload">exploit_payload</option>
+                                <option value="weaponize">weaponize</option>
+                                <option value="diff">diff</option>
+                                <option value="crash">crash</option>
+                                <option value="mailcraft">mailcraft</option>
+                                <option value="pretext">pretext</option>
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary" id="targetInput" placeholder="target" value="example.com">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-arsenal w-100" onclick="runModule()"><i class="bi bi-play-fill"></i> Execute</button>
+                        </div>
+                    </div>
+                    <div class="progress mt-2" style="height: 3px;">
+                        <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div id="runOutput" class="output-box mt-2" style="max-height: 250px;">
+                        <span class="text-secondary">Ready. Select module & target.</span>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-arsenal-outline" onclick="copyOutput()"><i class="bi bi-clipboard"></i> Copy</button>
+                        <button class="btn btn-sm btn-arsenal-outline" onclick="downloadOutput()"><i class="bi bi-download"></i> JSON</button>
+                        <button class="btn btn-sm btn-arsenal-outline" onclick="clearOutput()"><i class="bi bi-x-circle"></i> Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="col-md-7">
+            <!-- C2 -->
+            <div class="card-dark mb-3">
+                <div class="card-header"><i class="bi bi-hdd-network-fill text-info me-2"></i> C2 Listener</div>
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-2">
+                        <button class="btn btn-sm btn-success" onclick="startC2()"><i class="bi bi-play-fill"></i> Start</button>
+                        <button class="btn btn-sm btn-danger" onclick="stopC2()"><i class="bi bi-stop-fill"></i> Stop</button>
+                        <button class="btn btn-sm btn-secondary" onclick="refreshBeacons()"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+                    </div>
+                    <div id="beaconList" style="max-height: 120px; overflow-y: auto; font-size: 13px;">
+                        <span class="text-secondary">No beacons yet.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Findings Table -->
+            <div class="card-dark">
+                <div class="card-header"><i class="bi bi-table me-2"></i> Recent Findings</div>
+                <div class="card-body" style="max-height: 180px; overflow-y: auto;">
+                    <table class="table table-arsenal table-dark table-borderless">
+                        <thead><tr><th>Module</th><th>Target</th><th>Priority</th><th>Level</th></tr></thead>
+                        <tbody id="findingsTable">
+                            <tr><td colspan="4" class="text-secondary">No findings yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Catalog -->
+    <div class="card-dark mt-3">
+        <div class="card-header"><i class="bi bi-grid-3x3-gap-fill text-warning me-2"></i> Module Catalog</div>
+        <div class="card-body">
+            <div id="moduleList" class="d-flex flex-wrap gap-2"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let lastOutput = '';
+    let findingsHistory = [];
+
+    async function runModule() {
+        const module = document.getElementById('moduleSelect').value;
+        const target = document.getElementById('targetInput').value;
+        const output = document.getElementById('runOutput');
+        const progress = document.getElementById('progressBar');
+        
+        output.innerHTML = '<span class="text-secondary">⏳ Running...</span>';
+        progress.style.width = '20%';
+        
+        try {
+            const res = await fetch('/api/run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ module, target })
+            });
+            progress.style.width = '80%';
+            const data = await res.json();
+            progress.style.width = '100%';
+            
+            if (data.error) {
+                output.innerHTML = `<span class="text-danger">⚠️ ${data.error}</span>`;
+            } else {
+                lastOutput = JSON.stringify(data, null, 2);
+                output.innerHTML = `<pre style="margin:0;color:#c9d1d9;">${syntaxHighlight(lastOutput)}</pre>`;
+                updateStats(data, module, target);
+            }
+        } catch (e) {
+            progress.style.width = '100%';
+            output.innerHTML = `<span class="text-danger">❌ ${e.message}</span>`;
+        }
+        setTimeout(() => { progress.style.width = '0%'; }, 3000);
+    }
+
+    function syntaxHighlight(json) {
+        return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                   .replace(/("(?:[^"\\]|\\.)*")(?=\s*:)/g, '<span class="key">$1</span>')
+                   .replace(/: "([^"]*)"/g, ': <span class="string">"$1"</span>')
+                   .replace(/: (\d+)/g, ': <span class="number">$1</span>')
+                   .replace(/: (true|false)/g, ': <span class="boolean">$1</span>');
+    }
+
+    function updateStats(data, module, target) {
+        const json = JSON.stringify(data);
+        const priorityMatches = json.match(/"priority":\s*"P[1-5]"/g) || [];
+        const p1Matches = json.match(/"priority":\s*"P1"/g) || [];
+        document.getElementById('findingsCount').textContent = priorityMatches.length;
+        document.getElementById('criticalCount').textContent = p1Matches.length;
+
+        // Add to findings table
+        const table = document.getElementById('findingsTable');
+        if (priorityMatches.length > 0) {
+            priorityMatches.forEach(p => {
+                const level = p.match(/"level":\s*"([^"]+)"/);
+                const row = `<tr><td>${module}</td><td>${target}</td><td><span class="badge badge-${p.replace('"priority": "', '').replace('"', '').toLowerCase()}">${p}</span></td><td>${level ? level[1] : '-'}</td></tr>`;
+                table.innerHTML = row + table.innerHTML;
+            });
+            if (table.children.length > 5) table.deleteRow(5);
+        }
+    }
+
+    function copyOutput() { if (lastOutput) { navigator.clipboard.writeText(lastOutput); alert('✅ Copied!'); } }
+    function downloadOutput() { if (lastOutput) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([lastOutput])); a.download = 'result.json'; a.click(); } }
+    function clearOutput() { document.getElementById('runOutput').innerHTML = '<span class="text-secondary">Ready.</span>'; lastOutput = ''; }
+
+    async function refreshBeacons() {
+        const list = document.getElementById('beaconList');
+        const count = document.getElementById('beaconCount');
+        try {
+            const res = await fetch('/api/beacons');
+            const data = await res.json();
+            count.textContent = Object.keys(data).length;
+            if (Object.keys(data).length === 0) {
+                list.innerHTML = '<span class="text-secondary">No beacons yet.</span>';
+                return;
+            }
+            list.innerHTML = Object.entries(data).map(([id, info]) => 
+                `<div class="beacon-item"><span>${id}</span><span class="status ${info.last_seen > Date.now()/1000 - 60 ? 'status-online' : 'status-offline'}">${info.last_seen > Date.now()/1000 - 60 ? '🟢 Online' : '🔴 Offline'}</span></div>`
+            ).join('');
+        } catch { list.innerHTML = '<span class="text-danger">Error fetching beacons</span>'; }
+    }
+
+    async function startC2() { const r = await fetch('/api/c2/start', { method: 'POST' }); alert((await r.json()).message); }
+    async function stopC2() { const r = await fetch('/api/c2/stop', { method: 'POST' }); alert((await r.json()).message); }
+
+    fetch('/api/modules').then(r => r.json()).then(data => {
+        document.getElementById('moduleList').innerHTML = data.modules.map(m =>
+            `<span class="module-tag" onclick="document.getElementById('moduleSelect').value='${m}'">${m}</span>`
+        ).join(' ');
+    });
+
+    refreshBeacons();
+    setInterval(refreshBeacons, 5000);
+</script>
+</body>
+</html>

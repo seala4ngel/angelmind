@@ -134,7 +134,7 @@ Jika berhasil, di terminal 1 akan muncul shell.
 | Attack | phishing, exploit_payload, weaponize, diff, crash, mailcraft, pretext, attack, auto_exploit | P1 |
 | Recon | subhunter, portprobe, fingerprint | P5 |
 
-> Priority: P1 = Critical, P5 = Informasi
+Priority: P1 = Critical, P5 = Informasi
 
 ---
 

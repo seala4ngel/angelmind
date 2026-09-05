@@ -6,9 +6,14 @@ class WebFuzz:
 
     def scan(self, target):
         target = self.engine.normalize(target)
-        paths = ["admin", "login", "api", "backup", ".env", ".git", "wp-admin", "phpmyadmin", "cgi-bin", "config", "test", "dev", "stage"]
+        try:
+            with open("payloads/paths.txt", "r") as f:
+                paths = [line.strip() for line in f if line.strip()]
+        except:
+            paths = ["admin", "login", "api", ".env"]
+
         found = []
-        for path in paths:
+        for path in paths[:10]:  # ← UBAH 100 JADI 10
             try:
                 resp = self.engine.request(f"{target}/{path}")
                 if resp.status_code == 200:

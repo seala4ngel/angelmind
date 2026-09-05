@@ -4,12 +4,13 @@ import json
 import argparse
 from core.engine import ArsenalEngine
 from core.report import Report
+from core.telegram import Telegram
 from modules.exploit import SQLi, XSS, SSRF, SSTI, GraphQL, Deser, AuthBypass, Chain, VulnTrigger, RevShell, SQLiShell, SSRFRCE, Uploader
 from modules.scanner import Misconfig, LeakScan, BucketScan
 from modules.fuzz import WebFuzz, APIFuzz, IntelFuzz
 from modules.c2 import Implant, Beacon
 from modules.post import Privesc, Lateral, Cleanup, Persist
-from modules.attack import Phishing, ExploitPayload, Attack
+from modules.attack import Phishing, ExploitPayload, Attack, AutoExploit
 from modules.research import Weaponize, Diff, Crash
 from modules.phish import MailCraft, Pretext
 
@@ -25,7 +26,7 @@ def main():
                             'privesc', 'lateral', 'cleanup', 'persist',
                             'phishing', 'exploit_payload',
                             'weaponize', 'diff', 'crash',
-                            'mailcraft', 'pretext', 'attack'
+                            'mailcraft', 'pretext', 'attack', 'auto_exploit'
                         ],
                         help='Module to run')
     parser.add_argument('--target', '-t', required=True, help='Target URL or domain')
@@ -107,9 +108,20 @@ def main():
         result = Pretext(engine).generate(args.target, args.param or 'it_support')
     elif args.module == 'attack':
         result = Attack(engine).scan(args.target)
+    elif args.module == 'auto_exploit':
+        result = AutoExploit(engine).scan(args.target)
     else:
         print(f"Error: Unknown module '{args.module}'")
         sys.exit(1)
+    
+    # Kirim notifikasi ke Telegram kalo dapet P1
+    if result and isinstance(result, dict):
+        if result.get('priority') == 'P1' or result.get('vulnerable'):
+            try:
+                tg = Telegram(bot_token="YOUR_BOT_TOKEN", chat_id="YOUR_CHAT_ID")
+                tg.send(f"🔥 P1 Found!\nModule: {args.module}\nTarget: {args.target}\nResult: {json.dumps(result)[:500]}")
+            except:
+                pass
     
     if args.output == 'markdown' and result:
         report = Report([result])

@@ -1,6 +1,6 @@
 # Arsenal Apik v3.2
 
-Custom Security Arsenal — 39 Modules for Red Team, Bug Bounty, and Penetration Testing.
+**Custom Security Arsenal — 39 Modules for Red Team, Bug Bounty, and Penetration Testing.**
 
 Arsenal Apik adalah kumpulan tools keamanan custom yang ditulis dari 0. Bukan wrapper, bukan fork. Dirancang untuk profesional keamanan siber yang membutuhkan fleksibilitas dan kecepatan dalam pengujian penetrasi.
 
@@ -27,7 +27,7 @@ Arsenal Apik adalah kumpulan tools keamanan custom yang ditulis dari 0. Bukan wr
 ```bash
 git clone https://github.com/seala4ngel/angelmind.git
 cd angelmind
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Kali Linux / Parrot OS
@@ -37,7 +37,7 @@ sudo apt update
 sudo apt install python3 python3-pip git -y
 git clone https://github.com/seala4ngel/angelmind.git
 cd angelmind
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Termux (Android)
@@ -134,7 +134,7 @@ Jika berhasil, di terminal 1 akan muncul shell.
 | Attack | phishing, exploit_payload, weaponize, diff, crash, mailcraft, pretext, attack, auto_exploit | P1 |
 | Recon | subhunter, portprobe, fingerprint | P5 |
 
-> Priority: P1 = Critical, P5 = Informasi
+Priority: P1 = Critical, P5 = Informasi
 
 ---
 

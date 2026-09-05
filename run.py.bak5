@@ -4,6 +4,7 @@ import json
 import argparse
 from core.engine import ArsenalEngine
 from core.report import Report
+from modules.recon import SubHunter, PortProbe, Fingerprint
 from modules.exploit import SQLi, XSS, SSRF, SSTI, GraphQL, Deser, AuthBypass, Chain, VulnTrigger, RevShell, SQLiShell, SSRFRCE, Uploader
 from modules.scanner import Misconfig, LeakScan, BucketScan
 from modules.fuzz import WebFuzz, APIFuzz, IntelFuzz
@@ -14,9 +15,10 @@ from modules.research import Weaponize, Diff, Crash
 from modules.phish import MailCraft, Pretext
 
 def main():
-    parser = argparse.ArgumentParser(description='Arsenal Apik v3.2 — Fokus Attack (No Recon)')
+    parser = argparse.ArgumentParser(description='Arsenal Apik v3.1 — 39 Custom Modules')
     parser.add_argument('--module', '-m', required=True,
                         choices=[
+                            'subhunter', 'portprobe', 'fingerprint',
                             'sqli', 'xss', 'ssrf', 'ssti', 'graphql', 'deser', 'authbypass', 'chain', 'vulntrigger',
                             'revshell', 'sqli_shell', 'ssrf_shell', 'uploader',
                             'misconfig', 'leakscan', 'bucketscan',
@@ -41,7 +43,13 @@ def main():
     engine = ArsenalEngine()
     result = {}
     
-    if args.module == 'sqli':
+    if args.module == 'subhunter':
+        result = SubHunter(engine).scan(args.target)
+    elif args.module == 'portprobe':
+        result = PortProbe(engine).scan(args.target)
+    elif args.module == 'fingerprint':
+        result = Fingerprint(engine).scan(args.target)
+    elif args.module == 'sqli':
         result = SQLi(engine).scan(args.target, args.param)
     elif args.module == 'xss':
         result = XSS(engine).scan(args.target, args.param)
@@ -111,6 +119,7 @@ def main():
         print(f"Error: Unknown module '{args.module}'")
         sys.exit(1)
     
+    # Output formatting
     if args.output == 'markdown' and result:
         report = Report([result])
         print(report.to_markdown())
